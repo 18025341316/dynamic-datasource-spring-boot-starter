@@ -58,9 +58,13 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource {
     public DataSource determineDataSource() {
         return getDataSource(DynamicDataSourceContextHolder.getDataSourceLookupKey());
     }
-
+    /**
+     * 获取默认数据源
+     * @return
+     */
     private DataSource determinePrimaryDataSource() {
         log.debug("从默认数据源中返回数据");
+        System.out.println("从默认数据源中返回数据");
         return groupDataSources.containsKey(primary) ? groupDataSources.get(primary).determineDataSource() : dataSourceMap.get(primary);
     }
 
@@ -89,12 +93,16 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource {
      * @return 数据源
      */
     public DataSource getDataSource(String ds) {
+    	
+    	System.out.println("DynamicRoutingDataSource类中getDataSource -> "+ds);
         if (StringUtils.isEmpty(ds)) {
             return determinePrimaryDataSource();
         } else if (!groupDataSources.isEmpty() && groupDataSources.containsKey(ds)) {
             log.debug("从 {} 组数据源中返回数据源", ds);
+            System.out.println("从"+ds+"组数据源中返回数据源");
             return groupDataSources.get(ds).determineDataSource();
         } else if (dataSourceMap.containsKey(ds)) {
+        	System.out.println("从"+ds+"单数据源中返回数据源");
             log.debug("从 {} 单数据源中返回数据源", ds);
             return dataSourceMap.get(ds);
         }
@@ -149,7 +157,10 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource {
     }
 
     public void init() {
+    	this.dataSourceMap = provider.loadDataSources();
+    	/*
         Map<String, DataSource> dataSources = provider.loadDataSources();
+          
         log.info("初始共加载 {} 个数据源", dataSources.size());
         //添加并分组数据源
         for (Map.Entry<String, DataSource> dsItem : dataSources.entrySet()) {
@@ -161,7 +172,8 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource {
         } else if (dataSourceMap.containsKey(primary)) {
             log.info("当前的默认数据源是单数据源，数据源名为 {}", primary);
         } else {
-            throw new RuntimeException("请检查primary默认数据库设置");
+           // throw new RuntimeException("请检查primary默认数据库设置");
         }
+        */
     }
 }
